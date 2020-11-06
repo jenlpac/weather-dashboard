@@ -81,6 +81,7 @@ var getCurrentForecast = function(cityName, addToList){
                 document.getElementById("humidity").innerHTML = data.main.humidity + " %";
                 document.getElementById("wind").innerHTML = data.wind.speed + " MPH";
                 // Call function to get uv index:
+                getUVIndex(data.coord.lat, data.coord.lon, data.name);
 
                 // Add city to the list and save to local storage:
                 if (addToList && !searchHistoryArr.includes(data.name)){
@@ -97,6 +98,34 @@ var getCurrentForecast = function(cityName, addToList){
 }
 
 // Get UV index:
+var getUVIndex = function (lat, lon, cityName) {
+    apiUrlUV = "https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=c8221caa50c17bc5148346251519cc03";
+
+    fetch(apiUrlUV).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                console.log(data.value);
+                var uvEl = document.getElementById("uv");
+                uvEl.className="col-md-1 text-center text-black rounded-sm";
+                uvEl.innerHTML = data.value;
+                if (data.value <= 2)
+                    uvEl.style.backgroundColor = "green";
+                else if (data.value <= 5)
+                    uvEl.style.backgroundColor = "yellow";
+                else if (data.value <= 7)
+                    uvEl.style.backgroundColor = "orange";
+                else if (data.value <= 10)
+                    uvEl.style.backgroundColor = "red";
+                else
+                    uvEl.style.backgroundColor = "violet";
+
+            })
+        }
+    })
+    .catch(function(error){
+        displayError("Unable to connect to the server.", cityName);
+    });
+};
 
 // Get future forecast:
 var getFutureForecast = function (cityName) {
