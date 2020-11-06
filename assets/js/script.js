@@ -175,9 +175,15 @@ var getFutureForecast = function (cityName) {
 
 
 // Get weather from search history list:
+var searchList = function(event) {
+    var targetEl = event.target;
+    var cityName = event.target.getAttribute("sidebarList");
+    getCurrentForecast(cityName, false);
+    getFutureForecast(cityName);
+};
 
 
 
 getCity();
 
-// btnEl.addEventListener("click", searchCity);
+searchHistoryEl.addEventListener("click", searchList);
