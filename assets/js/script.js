@@ -41,7 +41,7 @@ var getCity = function() {
 }
 
 
-// Create city list in sidebar
+// Create city list in sidebar:
 var saveCityList = function(cityName) {
     var listEl = document.createElement("li");
     listEl.innerHTML = cityName;
@@ -49,5 +49,20 @@ var saveCityList = function(cityName) {
     listEl.setAttribute("sidebarList", cityName);
     searchHistoryEl.appendChild(listEl);
 }
+
+// Get city list from localStorage:
+var getCityList = function(){
+    var items = localStorage.getItem("sidebarList");
+    if (items){
+        searchHistoryArr = JSON.parse(items);
+
+        for (i = 0; i < searchHistoryArr.length; i++){
+            saveCityList(searchHistoryArr[i]);
+        }
+    }
+}
+
+
+
 
 // btnEl.addEventListener("click", searchCity);
