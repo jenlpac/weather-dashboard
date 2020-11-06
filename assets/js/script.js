@@ -14,10 +14,9 @@ var searchCity = function() {
     console.log(cityName);
     
     // Call to APIs for weather:
+    getCurrentForecast(cityName, true);
 
     searchInputEl.value = "";
-    saveCityList(cityName);
-    saveCity(cityName);
 }
 
 
@@ -30,8 +29,10 @@ var saveCity = function(cityName) {
 
 // Get searched cities from localStorage:
 var getCity = function() {
+    console.log("getCity");
     var items = localStorage.getItem("cityList");
     if (items) {
+        console.log("searchArray");
         searchHistoryArr = JSON.parse(items);
 
         for (i = 0; i < searchHistoryArr.length; i++) {
@@ -41,7 +42,7 @@ var getCity = function() {
 }
 
 
-// Create city list in sidebar:
+// Add city list to sidebar and localStorage:
 var saveCityList = function(cityName) {
     var listEl = document.createElement("li");
     listEl.innerHTML = cityName;
@@ -63,6 +64,46 @@ var getCityList = function(){
 }
 
 
+// Get current weather data
+var getCurrentForecast = function(cityName, addToList){
+    // Get API Url for weather forecast:
+    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=c8221caa50c17bc5148346251519cc03";
+  
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                var containerCurrent = document.getElementById("currentForecast");
+                containerCurrent.className = containerCurrent.className.replace(/\binvisible\b/g, "visible");
+                document.getElementById("cityName").innerHTML = data.name + "&nbsp;&nbsp;(" + moment().format("M/DD/YYYY") + ")";
+                document.getElementById("weatherIcon").src = "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
+                console.log(data.weather[0].icon);
+                document.getElementById("temperature").innerHTML = data.main.temp + " °F";
+                document.getElementById("humidity").innerHTML = data.main.humidity + " %";
+                document.getElementById("wind").innerHTML = data.wind.speed + " MPH";
+                // Call function to get uv index:
 
+                // Add city to the list and save to local storage:
+                if (addToList && !searchHistoryArr.includes(data.name)){
+                    saveCityList(data.name);
+                    saveCity(data.name);
+                }
+
+            });
+        } 
+    })
+    .catch(function(error){
+        displayError("Unable to connect to the server.", cityName);
+    });
+}
+
+// Get UV index:
+
+// Get future forecast:
+
+// Get weather from search history list:
+
+
+
+getCity();
 
 // btnEl.addEventListener("click", searchCity);
