@@ -15,6 +15,7 @@ var searchCity = function() {
     
     // Call to APIs for weather:
     getCurrentForecast(cityName, true);
+    getFutureForecast(cityName)
 
     searchInputEl.value = "";
 }
@@ -66,7 +67,7 @@ var getCityList = function(){
 
 // Get current weather data
 var getCurrentForecast = function(cityName, addToList){
-    // Get API Url for weather forecast:
+    // Get API url for weather forecast:
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=imperial&appid=c8221caa50c17bc5148346251519cc03";
   
     fetch(apiUrl).then(function(response) {
@@ -76,7 +77,6 @@ var getCurrentForecast = function(cityName, addToList){
                 containerCurrent.className = containerCurrent.className.replace(/\binvisible\b/g, "visible");
                 document.getElementById("cityName").innerHTML = data.name + "&nbsp;&nbsp;(" + moment().format("M/DD/YYYY") + ")";
                 document.getElementById("weatherIcon").src = "http://openweathermap.org/img/w/" + data.weather[0].icon + ".png";
-                console.log(data.weather[0].icon);
                 document.getElementById("temperature").innerHTML = data.main.temp + " °F";
                 document.getElementById("humidity").innerHTML = data.main.humidity + " %";
                 document.getElementById("wind").innerHTML = data.wind.speed + " MPH";
@@ -99,6 +99,51 @@ var getCurrentForecast = function(cityName, addToList){
 // Get UV index:
 
 // Get future forecast:
+var getFutureForecast = function (cityName) {
+    // Get API url for future forecast:
+    apiUrlFuture = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=c8221caa50c17bc5148346251519cc03"
+
+    fetch(apiUrlFuture).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+
+                var a = 1;
+                // For each day get weather data and create a card
+                for (i=0; i < data.list.length; i++) {
+                    if (data.list[i].dt_txt.includes("12:00:00")) {
+                        // Create card:
+                        var cardEl = document.getElementById("card" + a);
+                        cardEl.className = "card-body bg-primary text-white rounded-sm";
+                        cardEl.innerHTML="";
+                        // Add date:
+                        var dateEl = document.createElement("h5");
+                        dateEl.innerHTML = moment(data.list[i].dt_txt).format("MM/DD/YYY");
+                        cardEl.appendChild(dateEl);
+                        // Add icon:
+                        var imgEl = document.createElement("img");
+                        imgEl.src = "http://openweathermap.org/img/w/" + data.list[i].weather[0].icon + ".png";
+                        cardEl.appendChild(imgEl);
+                        // Add temperature:
+                        var tempEl = document.createElement("div");
+                        tempEl.innerHTML = "Temperature:&nbsp;&nbsp;" + data.list[i].main.temp + " °F";
+                        cardEl.appendChild(tempEl);
+                        // Add humidity:
+                        var humidEl = document.createElement("div");
+                        humidEl.innerHTML = "Humidity:&nbsp;&nbsp;" + data.list[i].main.humidity + " %";
+                        cardEl.appendChild(humidEl);
+
+                        a++;
+                    }
+                }
+            });
+        }
+    })
+    .catch(function(error){
+        displayError("Unable to connect to the server.", cityName);
+    });
+}
+
+
 
 // Get weather from search history list:
 
